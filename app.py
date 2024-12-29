@@ -6,6 +6,9 @@ from flask_cors import CORS
 import openai
 from langchain_openai import ChatOpenAI
 
+# Import your indexing logic
+from indexing import index_documents
+
 # Configure logging at DEBUG level
 logging.basicConfig(
     level=logging.DEBUG,
@@ -18,17 +21,41 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 frontend_origins = [
     "http://localhost:3000",
-    "https://interview-chat-frontend-15fa22817cf2.herokuapp.com"
+    "https://interview-chat-frontend-15fa22817cf2.herokuapp.com",
+    "https://interview.willkeck.com"
 ]
 CORS(app, resources={r"/api/*": {"origins": frontend_origins}})
 
 # In-memory conversation store:
-# { sessionToken: [ {role: "system"|"user"|"assistant", content: "..."} ] }
 conversation_history = {}
+
+# We'll store the Pinecone-based vector store globally for usage
+vectorstore = None
+
+@app.before_first_request
+def setup_vectorstore():
+    """
+    Called once before the first request is handled.
+    We call index_documents(), which:
+      1. Creates/connects to the 'interview-chat-bot' Pinecone index if not present.
+      2. Initializes a PineconeVectorStore with an existing Pinecone index + embeddings.
+      3. Upserts any docs we want into Pinecone.
+    We store the resulting vectorstore globally for usage in routes or chat endpoints.
+    """
+    global vectorstore
+    logging.info("Indexing documents (or loading existing index) from Pinecone...")
+
+    vectorstore = index_documents()
+    if vectorstore is None:
+        logging.error("Vector store not initialized. RAG won't work.")
+    else:
+        logging.info("Vector store is ready for usage.")
+
 
 @app.route("/", methods=["GET"])
 def health_check():
-    return jsonify({"status": "Using model gpt-4o with no markdown."})
+    return jsonify({"status": "Using model gpt-4o with no markdown, Pinecone integrated."})
+
 
 @app.route("/api/v1/session/init", methods=["POST"])
 def init_session():
@@ -39,10 +66,8 @@ def init_session():
     company = data.get("company")
     email = data.get("email")
 
-    # Generate or use a fake session token for this demo
-    fake_session_token = "session-1234"
+    fake_session_token = "session-1234"  # In real usage, generate a unique ID
 
-    # Create a conversation with an initial SYSTEM message that bans Markdown
     conversation_history[fake_session_token] = [
         {
             "role": "system",
@@ -50,6 +75,7 @@ def init_session():
                 "You are a helpful interview chat bot. "
                 "Provide answers in plain text only, with no Markdown formatting, no bullet points, "
                 "and no special headings. Respond politely in plain text. "
+                "You have access to relevant professional experience data from my resume and projects. "
             )
         }
     ]
@@ -59,6 +85,7 @@ def init_session():
         "sessionToken": fake_session_token,
         "message": f"Session created for {name} at {company}, email={email}"
     })
+
 
 @app.route("/api/v1/chat", methods=["POST"])
 def chat():
@@ -70,7 +97,6 @@ def chat():
     logging.debug("Session token: %s, user message: %r", session_token, user_message)
 
     if session_token not in conversation_history:
-        # If there's no stored conversation for this token, initialize it
         conversation_history[session_token] = [
             {
                 "role": "system",
@@ -78,6 +104,7 @@ def chat():
                     "You are a helpful interview chat bot. "
                     "Provide answers in plain text only, with no Markdown formatting, no bullet points, "
                     "and no special headings. Respond politely in plain text. "
+                    "You have access to relevant professional experience data."
                 )
             }
         ]
@@ -88,6 +115,24 @@ def chat():
         "content": user_message
     })
 
+    # Retrieve relevant docs from Pinecone
+    retrieved_context = ""
+    if vectorstore:
+        search_results = vectorstore.similarity_search(user_message, k=3)
+        # Combine them into one string
+        retrieved_context = "\n\n".join([res.page_content for res in search_results])
+    else:
+        logging.warning("vectorstore is None, skipping RAG retrieval.")
+
+    # Now build a final prompt that includes retrieved context
+    # We can either embed it into a system message or just tack it on
+    conversation_with_context = conversation_history[session_token] + [
+        {
+            "role": "system",
+            "content": f"Relevant context from my resume/projects:\n{retrieved_context}\n"
+        }
+    ]
+
     llm = ChatOpenAI(
         model_name="gpt-4o",
         openai_api_key=openai.api_key,
@@ -95,14 +140,13 @@ def chat():
     )
 
     try:
-        logging.info("Calling model with conversation: %r", conversation_history[session_token])
-        answer_obj = llm.invoke(conversation_history[session_token])
+        logging.info("Calling model with conversation (plus retrieved context).")
+        answer_obj = llm.invoke(conversation_with_context)
         logging.debug("Raw answer_obj: %s", answer_obj)
 
-        answer_str = answer_obj.content  # The plain text from the model
+        answer_str = answer_obj.content
         logging.debug("answer_str: %r", answer_str)
 
-        # Append assistant's reply
         conversation_history[session_token].append({
             "role": "assistant",
             "content": answer_str
@@ -115,6 +159,7 @@ def chat():
     response_body = {"response": answer_str}
     logging.debug("Final response body: %s", response_body)
     return jsonify(response_body)
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
