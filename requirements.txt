@@ -24,7 +24,7 @@ jsonpointer==3.0.0
 langchain==0.3.13
 langchain-core==0.3.28
 langchain-openai==0.2.14
-langchain-pinecone==0.2.0
+langchain-pinecone
 langchain-text-splitters==0.3.4
 langsmith==0.2.6
 MarkupSafe==3.0.2
