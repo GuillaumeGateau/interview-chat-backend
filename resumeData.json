@@ -1,0 +1,128 @@
+[
+  {
+    "id": "8",
+    "company": "Table4 AI",
+    "about": "Crafting innovative beverage and food pairing solutions with AI.",
+    "mission": "To revolutionize restaurant and hospitality experiences through personalized AI-powered recommendations.",
+    "team-size": "4",
+    "title": "Co-Founder",
+    "startDate": "May 2023",
+    "endDate": "Current",
+    "outcomes": [],
+    "imagePath": "/images/table4Logo.svg"
+  },
+  {
+    "id": "7",
+    "company": "Restaurant Brands International",
+    "about": "A global QSR leader with brands like Burger King, Popeyes, and Tim Hortons.",
+    "mission": "To enhance customer engagement and streamline app experiences through innovative personalization and optimization.",
+    "team-size": "4",
+    "title": "Director of Product, App and Production Optimization",
+    "startDate": "Nov 2023",
+    "endDate": "Current",
+    "outcomes": [
+      "Increased YoY digital revenue growth by 10% through personalization and redesign of the shopping funnel.",
+      "Drove a 75% increase in reward redemption with 1-click award redemption.",
+      "Increased revenue by $100M by reducing checkout steps from 4 to 1.",
+      "Improved order readiness by 20% using ML forecasting for orders."
+    ],
+    "imagePath": "/images/rbiLogo.jpeg"
+  },
+  {
+    "id": "6",
+    "company": "The RealReal",
+    "about": "The world's largest online marketplace for authenticated luxury consignment.",
+    "mission": "To transform the shopper and consignor experience through innovation and operational efficiency.",
+    "team-size": "8",
+    "title": "Senior Director of Product, Shopper, and Consignor Experience",
+    "startDate": "Sept 2022",
+    "endDate": "May 2023",
+    "outcomes": [
+      "Drove $10M annual EBITDA via a dynamic commission platform.",
+      "Increased seller items received by 15% with workflows to convert abandoned consignments.",
+      "Reduced checkout page load time by 75% with a re-platform.",
+      "Enabled continuous personalization testing via impression-level tracking and ML pipelines."
+    ],
+    "imagePath": "/images/trrLogo.jpeg"
+  },
+  {
+    "id": "5",
+    "company": "Macy's",
+    "about": "One of America’s largest omnichannel retailers.",
+    "mission": "To optimize the transactional funnel and drive growth through payment and loyalty innovations.",
+    "team-size": "9",
+    "title": "Director of Product, Transactional Funnel",
+    "startDate": "May 2020",
+    "endDate": "July 2022",
+    "outcomes": [
+      "Launched Klarna, Apple Pay, and PayPal, driving 25% of digital revenue.",
+      "Generated $90M in incremental GMV through CRO optimization.",
+      "Grew 800k credit accounts, adding $125M annualized revenue.",
+      "Saved $87M in chargeback costs by implementing ML fraud detection."
+    ],
+    "imagePath": "/images/macysLogo.png"
+  },
+  {
+    "id": "4",
+    "company": "Redfin",
+    "about": "A technology-powered real estate brokerage.",
+    "mission": "To enhance customer experience by leveraging innovative solutions in property search and engagement.",
+    "team-size": "4",
+    "title": "Director of Product, Customer Experience",
+    "startDate": "Aug 2018",
+    "endDate": "May 2020",
+    "outcomes": [
+      "Launched industry-first NLP search, increasing property CTR by 15%.",
+      "Improved conversion by 20% by surfacing information to eliminate poor matches.",
+      "Grew organic traffic by 30% with neighborhood guides and improved HTML."
+    ],
+    "imagePath": "/images/redfinLogo.png"
+  },
+  {
+    "id": "3",
+    "company": "Expedia - VRBO",
+    "about": "A global travel platform connecting travelers with unique accommodations.",
+    "mission": "To design a balanced marketplace that aligns business goals with user needs.",
+    "team-size": "3",
+    "title": "Senior Manager, Product, Marketplace Design",
+    "startDate": "Aug 2016",
+    "endDate": "Aug 2018",
+    "outcomes": [
+      "Rebuilt cancellation experiences with flexible policies and incentives.",
+      "Redesigned ranking algorithms to balance marketplace design goals.",
+      "Implemented ML pipelines for real-time models driving search and revenue management."
+    ],
+    "imagePath": "/images/expediaLogo.png"
+  },
+  {
+    "id": "2",
+    "company": "Zillow",
+    "about": "The leading real estate marketplace in the U.S.",
+    "mission": "To revolutionize the rental experience with innovative tools and data-driven strategies.",
+    "team-size": "0",
+    "title": "Senior Product Manager, Rentals",
+    "startDate": "Jan 2015",
+    "endDate": "July 2016",
+    "outcomes": [
+      "Doubled revenue YoY with lead pacing algorithms.",
+      "Implemented Renter Profiles with 95% completion, improving lead-to-lease ratios."
+    ],
+    "imagePath": "/images/zillowLogo.jpeg"
+  },
+  {
+    "id": "1",
+    "company": "ROA",
+    "about": "An innovative platform for global rent payment solutions.",
+    "mission": "To enable seamless international rent transactions through robust payment systems.",
+    "team-size": "0",
+    "title": "Co-Founder and Head of Product",
+    "startDate": "Dec 2012",
+    "endDate": "Jan 2015",
+    "outcomes": [
+      "Achieved $250K in sales in 6 months, serving 150k users.",
+      "Managed an offshore development team with a BDD agile process.",
+      "Researched and implemented a global rent payment platform."
+    ],
+    "imagePath": "/images/roaLogo.jpeg"
+  }
+]

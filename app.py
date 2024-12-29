@@ -72,10 +72,14 @@ def init_session():
         {
             "role": "system",
             "content": (
-                "You are a helpful interview chat bot. "
-                "Provide answers in plain text only, with no Markdown formatting, no bullet points, "
-                "and no special headings. Respond politely in plain text. "
-                "You have access to relevant professional experience data from my resume and projects. "
+                "You are a helpful interview chat bot. Provide answers in plain text only, "
+                "with no bullet points or special headings. Remain polite, direct, and professional. "
+                "Keep your responses under approximately 150 words. You have access to multiple roles "
+                "from my resume and various articles. If more than one reference can help form a "
+                "richer answer, incorporate those relevant details. If only one reference is truly "
+                "relevant, focus on that. Always rely on the retrieved text for any specific facts "
+                "or numbers. If you do not find a requested numeric detail, simply say you do not "
+                "have it rather than guessing. Stay honest and succinct."
             )
         }
     ]
@@ -96,20 +100,15 @@ def chat():
     user_message = data.get("message", "")
     logging.debug("Session token: %s, user message: %r", session_token, user_message)
 
+    # If there's no known conversation for this token,
+    # return an error rather than creating a fallback prompt.
     if session_token not in conversation_history:
-        conversation_history[session_token] = [
-            {
-                "role": "system",
-                "content": (
-                    "You are a helpful interview chat bot. "
-                    "Provide answers in plain text only, with no Markdown formatting, no bullet points, "
-                    "and no special headings. Respond politely in plain text. "
-                    "You have access to relevant professional experience data."
-                )
-            }
-        ]
+        return jsonify({
+            "error": "Invalid or missing session token. Please init session first."
+        }), 400
 
-    # Append user's new message
+    # Now we know conversation_history[session_token] exists;
+    # append the user message.
     conversation_history[session_token].append({
         "role": "user",
         "content": user_message
@@ -118,7 +117,7 @@ def chat():
     # Retrieve relevant docs from Pinecone
     retrieved_context = ""
     if vectorstore:
-        search_results = vectorstore.similarity_search(user_message, k=3)
+        search_results = vectorstore.similarity_search(user_message, k=10)
         # Combine them into one string
         retrieved_context = "\n\n".join([res.page_content for res in search_results])
     else:
