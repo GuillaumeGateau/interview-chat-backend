@@ -1,3 +1,5 @@
+# indexing.py
+
 import os
 import json
 import glob
@@ -141,12 +143,11 @@ def index_documents():
     dimension  = 1536  # For text-embedding-ada-002
     metric     = "cosine"
 
-    # List existing indexes to see if our target index exists
-    existing_list = pc.list_indexes()  # returns a ListIndexesResponse
-    existing_names = existing_list.names()  # get the list of index names as strings
+    # Check if index exists; if not, create
+    existing_list = pc.list_indexes()
+    existing_indexes = [idx_info["name"] for idx_info in existing_list]
 
-    # If the index doesn't exist, create it
-    if index_name not in existing_names:
+    if index_name not in existing_indexes:
         logging.info(f"Creating Pinecone index '{index_name}' in '{pinecone_env}'...")
         pc.create_index(
             name=index_name,
@@ -158,9 +159,9 @@ def index_documents():
         while not pc.describe_index(index_name).status["ready"]:
             time.sleep(1)
     else:
-        logging.info(f"Index '{index_name}' already exists: {existing_names}")
+        logging.info(f"Index '{index_name}' already exists: {existing_indexes}")
 
-    # Grab the index reference
+    # Grab the index
     index = pc.Index(index_name)
 
     # Setup embeddings
@@ -183,14 +184,4 @@ def index_documents():
         vector_store.add_documents(documents=docs)
         logging.info(f"Successfully indexed {len(docs)} documents into Pinecone.")
 
-    # -------------
-    # OPTIONAL: Delete the index at the end
-    #
-    # If you do this, the index will be removed every time this function finishes,
-    # so you won't have a persistent vector store for searching afterward.
-    #
-    # pc.delete_index(index_name)
-    #
-    # -------------
-    
     return vector_store
